@@ -23,18 +23,22 @@ def edit_item_name(manager: InventoryManager, id_: int) -> None:
     manager.edit_name(id_, name)
 
 def edit_item_amount(manager: InventoryManager, id_: int) -> None:
-    amount = int(input("Enter amount: "))
+    try:
+        amount = int(input("Enter amount: "))
+        if amount < 0: raise ValueError
 
-    if amount < 0: raise ValueError("Invalid Amount")
-
-    manager.edit_amount(id_, amount)
+        manager.edit_amount(id_, amount)
+    except ValueError:
+        print("Invalid Amount")
 
 def edit_item_price(manager: InventoryManager, id_: int) -> None:
-    price = float(input("Enter price: "))
+    try:
+        price = float(input("Enter price: "))
+        if price < 0: raise ValueError
 
-    if price < 0: raise ValueError("Invalid Price")
-
-    manager.edit_price(id_, price)
+        manager.edit_price(id_, price)
+    except ValueError:
+        print("Invalid Price")
 
 def edit_item(manager: InventoryManager) -> None:
     try:
@@ -43,24 +47,27 @@ def edit_item(manager: InventoryManager) -> None:
         print("A - Edit Name | S - Edit Amount | D - Edit Price | F - Delete Item")
         action = input().upper()
 
-        if not is_valid_action(action) or not manager.is_valid_id(id_): raise ValueError
+        if not manager.is_valid_id(id_):
+            raise ValueError("Invalid ID")
+        if not is_valid_action(action):
+            raise ValueError("Invalid Action")
 
         if action == "A": edit_item_name(manager, id_)
         elif action == "S": edit_item_amount(manager, id_)
         elif action == "D": edit_item_price(manager, id_)
         elif action == "F": manager.remove_item(id_)
 
-    except ValueError:
-        print("Invalid ID or Action")
+    except ValueError as e:
+        print(e)
 
 def print_inventory(manager: InventoryManager) -> None:
     item_list = manager.get_inventory()
 
-    print("+-———-+-——————————————————————————————————-+-————————-+-———————-+")
+    print("—————————————————————————————————————————————————————————————————")
     print("| Id  | Name                                   | Amount | Price |")
 
     for item in item_list:
-        print("+-———-+-——————————————————————————————————-+-————————-+-———————-+")
+        print("—————————————————————————————————————————————————————————————————")
         print("|{:^5}| {:<38} |{:^8}|{:^7}|".format(item[0], item[1], item[2], item[3]))
 
 def close_program(manager: InventoryManager) -> None:
@@ -68,9 +75,9 @@ def close_program(manager: InventoryManager) -> None:
     manager.end_connection()
 
 def start_menu() -> None:
-    actions_bar = ("+-——————————————————-+-————————————-+-—————————————-+-—————————-+",
+    actions_bar = ("—————————————————————————————————————————————————————————————————",
                    "| A - Show Inventory | S - Add Item | D - Edit Item | F - Close |",
-                   "+-——————————————————-+-————————————-+-—————————————-+-—————————-+"
+                   "—————————————————————————————————————————————————————————————————"
                    )
 
     inventory_manager = InventoryManager()
